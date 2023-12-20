@@ -51,3 +51,29 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  modify-yaml:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Changing the deployment yaml
+        with:
+          repository: "EngVision/Engvision-Deployment"
+          token: ${{ secrets.PAT_GH_ACTION }}
+      - name: Modify the image
+        run: |
+          git config --global user.name 'minhtringuyennn'
+          git config --global user.email 'contact@minhtringuyennn.com'
+          sed -i "s+ghcr.io/engvision/whisper-service.*+ghcr.io/engvision/whisper-service-${{ github.run_number }}+g" ./k8s/evs-whisper-deployment.yml
+          git add .
+          git commit -m 'Github Actions - Deploy EngVision Whisper build ver ${{ github.run_number }}'
+          git push origin main
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          PAT_GH_ACTION: ${{ secrets.PAT_GH_ACTION }}
