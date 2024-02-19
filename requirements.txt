@@ -1,4 +1,13 @@
+-f https://download.pytorch.org/whl/torch_stable.html
 flask
 flask-cors
 gunicorn
 openai-whisper
+torch==1.10.1
+torchaudio==0.10.1
+requests
+omegaconf
+audioread
+dtwalign
+eng_to_ipa
+ortools==9.2.9972

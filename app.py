@@ -4,6 +4,10 @@ from tempfile import NamedTemporaryFile
 import whisper
 import threading
 import uuid
+import json
+
+import speech_evaluation
+
 
 model = whisper.load_model("base")
 app = Flask(__name__)
@@ -54,6 +58,13 @@ def check_status(file_id):
         return jsonify({"status": "processing"})
     else:
         return jsonify({"status": "completed", "result": status})
+
+
+@app.route("/speech-evaluation", methods=["POST"])
+def handle_speech_evaluation():
+    event = {"body": json.dumps(request.get_json(force=True))}
+    lambda_correct_output = speech_evaluation.lambda_handler(event, [])
+    return lambda_correct_output
 
 
 if __name__ == "__main__":

@@ -1,16 +1,23 @@
-FROM python:3.11-slim
+FROM python:3.9-slim
 
 WORKDIR /
 
+RUN apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    --no-install-recommends \
+    git \
+    ffmpeg \
+    python3-pip \
+    build-essential \
+    gcc \
+    libpq-dev \
+    make && \
+    apt-get clean autoclean && \
+    apt-get autoremove --yes
+
+COPY requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
+
 COPY . .
-
-RUN apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install \
- -y --no-install-recommends git ffmpeg python3-pip && \
- apt-get clean autoclean && apt-get autoremove --yes
-
-RUN pip3 install -r requirements.txt
-
-RUN python3 load_model.py
 
 EXPOSE 8000
 
