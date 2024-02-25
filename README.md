@@ -44,15 +44,46 @@ Once the container is running, the service will be available at `http://localhos
    - Description: A simple endpoint to confirm that the service is running.
    - Response: "Hello from EngVision Whisper!"
 
-2. **Speech to Text Endpoint** (`POST /stt`):
+2. **Speech to Text Endpoint** (`POST /stt/<file_id>`):
 
    - Description: Upload an audio file for transcription.
-   - Request: A `multipart/form-data` request with the audio file.
-   - Response: A JSON containing the `status` and `check_url` for the transcription task.
+   - Response:
+
+   ```json
+   {
+     "_id": "65dac9d6b407958caa1af7f7",
+     "file_id": "65dac9d6b407958caa1af7f7",
+     "status": "processing",
+     "text": null
+   }
+   ```
 
 3. **Check Status Endpoint** (`GET /stt/<file_id>`):
    - Description: Check the status of a transcription task.
    - Response: A JSON with the `status` of the task and the `result` if completed.
+   ```json
+   {
+     "_id": "65dac9d6b407958caa1af7f7",
+     "file_id": "65dac9d6b407958caa1af7f7",
+     "status": "completed",
+     "text": " This is my favorite food."
+   }
+   ```
+4. **Speech Evaluation Endpoint** (`POST /stt/speech-evaluation`):
+   - Description: Get IPA and evaluation.
+   - Response:
+   ```json
+   {
+     "_id": "65dac87bd469ca2adaed6f98",
+     "correct_letters": "111 11 111 111111111 111 ",
+     "original_ipa_transcript": "ðɪs ɪz maɪ ˈfeɪvərɪt fud",
+     "original_transcript": "This is my favourite food",
+     "pronunciation_accuracy": "95",
+     "submission_id": "65dac87bd469ca2adaed6f98",
+     "voice_ipa_transcript": "ðɪs ɪz maɪ ˈfeɪvərɪt fud",
+     "voice_transcript": "this is my favorite food"
+   }
+   ```
 
 ### Example Usage
 

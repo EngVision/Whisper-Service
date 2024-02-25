@@ -69,7 +69,7 @@ def lambda_handler(event, context):
         "correct_letters": correct_letters,
     }
 
-    return json.dumps(res)
+    return res
 
 
 # From Librosa

@@ -74,8 +74,8 @@ def check_status(file_id):
 def handle_speech_evaluation():
     event = {"body": json.dumps(request.get_json(force=True))}
     lambda_correct_output = speech_evaluation.lambda_handler(event, [])
-    speech_evaluation_collection.insert_one(json.loads(lambda_correct_output))
-    return lambda_correct_output
+    speech_evaluation_collection.insert_one(lambda_correct_output)
+    return jsonify(lambda_correct_output)
 
 
 if __name__ == "__main__":
