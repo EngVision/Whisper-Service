@@ -1,3 +1,4 @@
+import os
 from tempfile import NamedTemporaryFile
 import requests
 from torchaudio.transforms import Resample
@@ -21,7 +22,7 @@ def lambda_handler(event, context):
     data = json.loads(event["body"])
     
     original = data["original"]
-    response = requests.get(f"https://dev-bucket.engvision.edu.vn/{data['fileId']}")
+    response = requests.get(f"{os.environ.get('BUCKET_URL')}{data['fileId']}")
     temp = NamedTemporaryFile(delete=True)
     temp.write(response.content)
 
@@ -59,8 +60,8 @@ def lambda_handler(event, context):
         )
 
     res = {
-        "_id": data["submissionId"],
-        "submission_id": data["submissionId"],
+        "_id": data['fileId'],
+        "file_id": data['fileId'],
         "original_transcript": original_transcript,
         "voice_transcript": result["recording_transcript"],
         "original_ipa_transcript": original_ipa_transcript,

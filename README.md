@@ -69,8 +69,15 @@ Once the container is running, the service will be available at `http://localhos
      "text": " This is my favorite food."
    }
    ```
-4. **Speech Evaluation Endpoint** (`POST /stt/speech-evaluation`):
+4. **Speech Evaluation Endpoint** (`POST /speech-evaluation`):
    - Description: Get IPA and evaluation.
+   - Body:
+   ```json
+   {
+     "fileId": "65dac87bd469ca2adaed6f98",
+     "original": "This is my favourite food"
+   }
+   ```
    - Response:
    ```json
    {

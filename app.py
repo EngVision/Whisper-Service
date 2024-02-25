@@ -1,4 +1,6 @@
+import os
 from flask import Flask, jsonify, request
+from flask.cli import load_dotenv
 from flask_cors import CORS
 from tempfile import NamedTemporaryFile
 import whisper
@@ -10,20 +12,19 @@ from enums import StatusEnum
 
 import speech_evaluation
 
-
+load_dotenv()
 model = whisper.load_model("base.en")
 app = Flask(__name__)
 CORS(app)
 
-mongo_client = pymongo.MongoClient(
-    "mongodb+srv://admin:5LnPkKh2dx1JFEI6@cluster0.sugklve.mongodb.net/dev?retryWrites=true&w=majority")
+mongo_client = pymongo.MongoClient(os.environ.get("MONGO_URI"))
 mongo_db = mongo_client["dev"]
-speech_to_text_collection = mongo_db["speechtotext"]
-speech_evaluation_collection = mongo_db["speechevaluation"]
+speech_to_text_collection = mongo_db["speechtotexts"]
+speech_evaluation_collection = mongo_db["speechevaluations"]
 
 
 def transcribe_background(file_id):
-    response = requests.get(f'https://dev-bucket.engvision.edu.vn/{file_id}')
+    response = requests.get(f'{os.environ.get("BUCKET_URL")}{file_id}')
     temp = NamedTemporaryFile(delete=True)
     temp.write(response.content)
     result = model.transcribe(temp.name)
@@ -44,7 +45,7 @@ def whisper_handler(file_id):
     if result is not None:
         return jsonify(result)
 
-    response = requests.get(f'https://dev-bucket.engvision.edu.vn/{file_id}')
+    response = requests.get(f'{os.environ.get("BUCKET_URL")}{file_id}')
     if response.status_code != 200:
         return jsonify({"error": "File not found"}), 404
 
@@ -52,6 +53,7 @@ def whisper_handler(file_id):
         "_id": file_id,
         "file_id": file_id,
         "text": None,
+        "evaluation": "",
         "status": StatusEnum.PROCESSING.value}
     speech_to_text_collection.insert_one(data)
     threading.Thread(

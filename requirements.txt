@@ -12,3 +12,4 @@ dtwalign
 eng_to_ipa
 ortools==9.2.9972
 pymongo
+python-dotenv
