@@ -1,11 +1,11 @@
+from tempfile import NamedTemporaryFile
+import requests
 from torchaudio.transforms import Resample
 
 import torch
 import numpy as np
-import base64
 import audioread
 import json
-import os
 
 import utils
 import trainer
@@ -19,26 +19,19 @@ transform = Resample(orig_freq=48000, new_freq=16000)
 
 def lambda_handler(event, context):
     data = json.loads(event["body"])
-
+    
     original = data["original"]
-    file_header = "data:audio/webm;codecs=opus;base64,"
-    file_extension = ".webm"
-    file_bytes = base64.b64decode(
-        data["base64Audio"][len(file_header) :].encode("utf-8")
-    )
+    response = requests.get(f"https://dev-bucket.engvision.edu.vn/{data['fileId']}")
+    temp = NamedTemporaryFile(delete=True)
+    temp.write(response.content)
 
-    random_file_name = "./" + utils.generateRandomString() + file_extension
-    f = open(random_file_name, "wb")
-    f.write(file_bytes)
-    f.close()
-
-    signal, fs = audioread_load(random_file_name)
+    signal, fs = audioread_load(temp.name)
 
     signal = transform(torch.Tensor(signal)).unsqueeze(0)
 
     result = trainer_SST_lambda["en"].processAudioForGivenText(signal, original)
 
-    os.remove(random_file_name)
+    temp.close()
 
     original_ipa_transcript = " ".join(
         [word[0] for word in result["real_and_transcribed_words_ipa"]]
@@ -47,12 +40,9 @@ def lambda_handler(event, context):
     original_transcript = " ".join(
         [word[0] for word in result["real_and_transcribed_words"]]
     )
-    matched_transcripts = " ".join(
-        [word[1] for word in result["real_and_transcribed_words"]]
-    )
 
-    words_real = original_transcript.lower().split()
-    mapped_words = matched_transcripts.split()
+    words_real = original_ipa_transcript.lower().split()
+    mapped_words = result["recording_ipa"].split()
 
     correct_letters = ""
     for idx, word_real in enumerate(words_real):
@@ -69,6 +59,8 @@ def lambda_handler(event, context):
         )
 
     res = {
+        "_id": data["submissionId"],
+        "submission_id": data["submissionId"],
         "original_transcript": original_transcript,
         "voice_transcript": result["recording_transcript"],
         "original_ipa_transcript": original_ipa_transcript,

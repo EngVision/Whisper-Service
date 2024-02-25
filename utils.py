@@ -171,12 +171,10 @@ def get_best_mapped_words(words_estimated: list, words_real: list) -> list:
 
 
 def getWhichLettersWereTranscribedCorrectly(real_word, transcribed_word):
-    is_leter_correct = [None] * len(real_word)
+    is_leter_correct = [0] * len(real_word)
     for idx, letter in enumerate(real_word):
         if letter == transcribed_word[idx] or letter in punctuation:
             is_leter_correct[idx] = 1
-        else:
-            is_leter_correct[idx] = 0
     return is_leter_correct
 
 
