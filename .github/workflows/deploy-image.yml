@@ -51,6 +51,9 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            MONGO_DB=${{ secrets.MONGO_DB }}
 
   modify-yaml:
     needs: build-and-push-image

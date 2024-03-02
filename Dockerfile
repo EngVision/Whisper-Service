@@ -19,6 +19,12 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ARG MONGO_URI
+ARG BUCKET_URL
+
+ENV MONGO_URI=$MONGO_URI
+ENV BUCKET_URL=$BUCKET_URL
+
 EXPOSE 8000
 
 CMD [ "gunicorn", "-w1", "-b 0.0.0.0:8000", "-t 600", "app:app"]
