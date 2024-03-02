@@ -12,6 +12,7 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    environment: Whisper
     strategy:
       fail-fast: false
       matrix:
@@ -58,6 +59,7 @@ jobs:
   modify-yaml:
     needs: build-and-push-image
     runs-on: ubuntu-latest
+    environment: Whisper
 
     permissions:
       contents: write
